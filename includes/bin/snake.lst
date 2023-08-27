@@ -1,0 +1,461 @@
+Listing for file "src\snake.asm"
+    3 00:0000 -  -  -  -  queueTail equ 0
+    4 00:0000 -  -  -  -  queueHead equ 2
+    5 00:0000 -  -  -  -  queueCount equ 4
+    6 00:0000 -  -  -  -  queueSize equ 6
+    7 00:0000 -  -  -  -  queueArr equ 8
+    8 00:0000 -  -  -  -  
+    9 00:0000 -  -  -  -  .list
+   10 00:0000 -  -  -  -   .assume ADL=1
+   11 00:0000 -  -  -  -   .org userMem-2
+   12 D1:A87F EF 7B -  -   .db tExtTok,tAsm84CeCmp
+   13 D1:A881 -  -  -  -  
+   14 D1:A881 -  -  -  -  init:
+   15 D1:A881 CD 10 08 02  call _ClrScrnFull
+   16 D1:A885 CD 28 08 02  call _HomeUp
+   17 D1:A889 CD 48 08 02  call _RunIndicOff
+   18 D1:A88D ED 6E -  -   ld a,mb
+   19 D1:A88F -  -  -  -   ;save flags
+   20 D1:A88F F5 -  -  -       push af
+   21 D1:A890 FD E5 -  -       push iy
+   22 D1:A892 3A 00 00 F3  ld a,(mpRtcRange)
+   23 D1:A896 32 A8 A9 D1  ld (time),a
+   24 D1:A89A DD 21 AF A9 
+              D1 -  -  -   ld ix,snake
+   25 D1:A89F 01 02 06 00  ld bc,1538
+   26 D1:A8A3 11 F6 31 D0  ld de,pixelShadow
+   27 D1:A8A7 -  -  -  -  
+   28 D1:A8A7 F3 -  -  -   di
+   29 D1:A8A8 ED 7D -  -   stmix
+   30 D1:A8AA 3E D1 -  -   ld a,$d1
+   31 D1:A8AC ED 6D -  -   ld mb,a
+   32 D1:A8AE -  -  -  -  
+   33 D1:A8AE 5B CD BA A9 
+              D1 -  -  -   call.il initQueue
+   34 D1:A8B3 3A A9 A9 D1  ld a,(pos)
+   35 D1:A8B7 5B CD C2 A9 
+              D1 -  -  -   call.il enqueue
+   36 D1:A8BC 3A AA A9 D1  ld a,(pos+1)
+   37 D1:A8C0 5B CD C2 A9 
+              D1 -  -  -   call.il enqueue
+   38 D1:A8C5 -  -  -  -  
+   39 D1:A8C5 5B CD 3C AA 
+              D1 -  -  -   call.il draw
+   40 D1:A8CA 5B CD D5 A8 
+              D1 -  -  -   call.il loop
+   41 D1:A8CF ED 7E -  -   rsmix
+   42 D1:A8D1 -  -  -  -  
+   43 D1:A8D1 C3 8D A9 D1  jp exit
+   44 D1:A8D5 -  -  -  -  
+   45 D1:A8D5 -  -  -  -  
+   46 D1:A8D5 -  -  -  -  loop:
+   47 D1:A8D5 -  -  -  -   ;keyboard
+   48 D1:A8D5 21 00 00 F5  ld hl,mpKeyRange
+   49 D1:A8D9 36 02 -  -   ld (hl),2
+   50 D1:A8DB -  -  -  -  
+   51 D1:A8DB AF -  -  -   xor a
+   52 D1:A8DC -  -  -  -  wait:
+   53 D1:A8DC BE -  -  -   cp a,(hl)
+   54 D1:A8DD C2 DC A8 D1  jp nz,wait
+   55 D1:A8E1 -  -  -  -  
+   56 D1:A8E1 3A 1E 00 F5  ld a,(mpKeyData+$e)
+   57 D1:A8E5 CB 47 -  -   bit 0,a ;down
+   58 D1:A8E7 16 00 -  -   ld d,0
+   59 D1:A8E9 1E 01 -  -   ld e,1
+   60 D1:A8EB 5B C4 1C AA 
+              D1 -  -  -   call.il nz,setDir
+   61 D1:A8F0 CB 4F -  -   bit 1,a ;left
+   62 D1:A8F2 16 FF -  -   ld d,-1
+   63 D1:A8F4 1E 00 -  -   ld e,0
+   64 D1:A8F6 5B C4 1C AA 
+              D1 -  -  -   call.il nz,setDir
+   65 D1:A8FB CB 57 -  -   bit 2,a ;right
+   66 D1:A8FD 16 01 -  -   ld d,1
+   67 D1:A8FF 1E 00 -  -   ld e,0
+   68 D1:A901 5B C4 1C AA 
+              D1 -  -  -   call.il nz,setDir
+   69 D1:A906 CB 5F -  -   bit 3,a ;up
+   70 D1:A908 16 00 -  -   ld d,0
+   71 D1:A90A 1E FF -  -   ld e,-1
+   72 D1:A90C 5B C4 1C AA 
+              D1 -  -  -   call.il nz,setDir
+   73 D1:A911 -  -  -  -  
+   74 D1:A911 -  -  -  -   ;timer
+   75 D1:A911 3A 00 00 F3  ld a,(mpRtcRange)
+   76 D1:A915 47 -  -  -   ld b,a
+   77 D1:A916 3A A8 A9 D1  ld a,(time)
+   78 D1:A91A B8 -  -  -   cp a,b
+   79 D1:A91B 78 -  -  -   ld a,b
+   80 D1:A91C 32 A8 A9 D1  ld (time),a
+   81 D1:A920 C2 28 A9 D1  jp nz,update
+   82 D1:A924 C3 D5 A8 D1  jp loop
+   83 D1:A928 -  -  -  -  
+   84 D1:A928 -  -  -  -  update:
+   85 D1:A928 -  -  -  -   ;pos.x += dir.x
+   86 D1:A928 3A AB A9 D1  ld a,(dir)
+   87 D1:A92C 47 -  -  -   ld b,a
+   88 D1:A92D 3A A9 A9 D1  ld a,(pos)
+   89 D1:A931 80 -  -  -   add a,b
+   90 D1:A932 32 A9 A9 D1  ld (pos),a
+   91 D1:A936 -  -  -  -  
+   92 D1:A936 -  -  -  -   ;pos.y += dir.y
+   93 D1:A936 3A AC A9 D1  ld a,(dir+1)
+   94 D1:A93A 47 -  -  -   ld b,a
+   95 D1:A93B 3A AA A9 D1  ld a,(pos+1)
+   96 D1:A93F 80 -  -  -   add a,b
+   97 D1:A940 32 AA A9 D1  ld (pos+1),a
+   98 D1:A944 -  -  -  -  
+   99 D1:A944 -  -  -  -   ;if pos.x > 31 or pos.x < 0 then exit
+  100 D1:A944 3A A9 A9 D1  ld a,(pos)
+  101 D1:A948 FE 20 -  -   cp a,32
+  102 D1:A94A D2 8B A9 D1  jp nc,dead
+  103 D1:A94E 3A A9 A9 D1  ld a,(pos)
+  104 D1:A952 B7 -  -  -   or a
+  105 D1:A953 DA 8B A9 D1  jp c,dead
+  106 D1:A957 -  -  -  -  
+  107 D1:A957 -  -  -  -   ;if pos.y > 23 or pos.y < 0 then exit
+  108 D1:A957 3A AA A9 D1  ld a,(pos+1)
+  109 D1:A95B FE 18 -  -   cp a,24
+  110 D1:A95D D2 8B A9 D1  jp nc,dead
+  111 D1:A961 B7 -  -  -   or a
+  112 D1:A962 DA 8B A9 D1  jp c,dead
+  113 D1:A966 -  -  -  -  
+  114 D1:A966 5B CD EF A9 
+              D1 -  -  -   call.il dequeue
+  115 D1:A96B 5B CD EF A9 
+              D1 -  -  -   call.il dequeue
+  116 D1:A970 -  -  -  -  
+  117 D1:A970 3A A9 A9 D1  ld a,(pos)
+  118 D1:A974 5B CD C2 A9 
+              D1 -  -  -   call.il enqueue
+  119 D1:A979 3A AA A9 D1  ld a,(pos+1)
+  120 D1:A97D 5B CD C2 A9 
+              D1 -  -  -   call.il enqueue
+  121 D1:A982 -  -  -  -  
+  122 D1:A982 5B CD 3C AA 
+              D1 -  -  -   call.il draw
+  123 D1:A987 -  -  -  -  
+  124 D1:A987 C3 D5 A8 D1  jp loop
+  125 D1:A98B -  -  -  -  
+  126 D1:A98B -  -  -  -  dead:
+  127 D1:A98B 5B C9 -  -   ret.l
+  128 D1:A98D -  -  -  -  
+  129 D1:A98D -  -  -  -  exit:
+  130 D1:A98D -  -  -  -   ;restore flags
+  131 D1:A98D FD E1 -  -       pop iy
+  132 D1:A98F F1 -  -  -       pop af
+  133 D1:A990 ED 6D -  -   ld mb,a
+  134 D1:A992 FB -  -  -   ei
+  135 D1:A993 CD EA AA D1  call RestoreKeyboard
+  136 D1:A997 CD 8C 0D 02  call _GetKey
+  137 D1:A99B CD 10 08 02  call _ClrScrnFull
+  138 D1:A99F CD 28 08 02  call _HomeUp
+  139 D1:A9A3 FD CB 00 AE  res donePrgm,(iy+doneFlags)
+  140 D1:A9A7 C9 -  -  -   ret
+  141 D1:A9A8 -  -  -  -   
+  142 D1:A9A8 -  -  -  -  time:
+  143 D1:A9A8 00 -  -  -   .db 0
+  144 D1:A9A9 -  -  -  -  
+  145 D1:A9A9 -  -  -  -  pos: ;(0,0) -> (31,23)
+  146 D1:A9A9 10 0C -  -   .db 16,12
+  147 D1:A9AB -  -  -  -  
+  148 D1:A9AB -  -  -  -  dir: ;(+-1,+-1)
+  149 D1:A9AB 00 FF -  -   .db 0,-1
+  150 D1:A9AD -  -  -  -  
+  151 D1:A9AD -  -  -  -  apple:
+  152 D1:A9AD 00 00 -  -   .db 0,0
+  153 D1:A9AF -  -  -  -  
+  154 D1:A9AF -  -  -  -  snake: ;queue
+  155 D1:A9AF 00 00 -  -  .dw 0 ;tail
+  156 D1:A9B1 00 00 -  -  .dw 0 ;head
+  157 D1:A9B3 00 00 -  -  .dw 0 ;count
+  158 D1:A9B5 00 00 -  -  .dw 0 ;size
+  159 D1:A9B7 00 00 00 -  .db 0,0,0 ;arr
+  160 D1:A9BA -  -  -  -  
+  161 D1:A9BA -  -  -  -  .assume ADL=1
+  162 D1:A9BA -  -  -  -  ;ez80 mode
+  163 D1:A9BA -  -  -  -  ;initiates the size and arr of a queue
+  164 D1:A9BA -  -  -  -  ;ix = queue
+  165 D1:A9BA -  -  -  -  ;bc = size
+  166 D1:A9BA -  -  -  -  ;de = arr
+  167 D1:A9BA -  -  -  -  initQueue:
+  168 D1:A9BA DD 0F 06 -   ld (ix+queueSize),bc
+  169 D1:A9BD DD 1F 08 -   ld (ix+queueArr),de
+  170 D1:A9C0 -  -  -  -  
+  171 D1:A9C0 5B C9 -  -   ret.l
+  172 D1:A9C2 -  -  -  -   
+  173 D1:A9C2 -  -  -  -  .assume ADL=1
+  174 D1:A9C2 -  -  -  -  ;ez80 mode
+  175 D1:A9C2 -  -  -  -  ;adds an element to the front
+  176 D1:A9C2 -  -  -  -  ;ix = queue
+  177 D1:A9C2 -  -  -  -  ;a = element
+  178 D1:A9C2 -  -  -  -  ;corrupts hl,bc
+  179 D1:A9C2 -  -  -  -  enqueue:
+  180 D1:A9C2 40 DD 07 02  ld.sis bc,(ix+queueHead)
+  181 D1:A9C6 DD 27 08 -   ld hl,(ix+queueArr)
+  182 D1:A9C9 09 -  -  -   add hl,bc
+  183 D1:A9CA 77 -  -  -   ld (hl),a
+  184 D1:A9CB -  -  -  -  
+  185 D1:A9CB -  -  -  -   ;queueHead = (queueHead + 1) % queueSize
+  186 D1:A9CB 40 DD 27 02  ld.sis hl,(ix+queueHead)
+  187 D1:A9CF 40 23 -  -   inc.sis hl
+  188 D1:A9D1 40 DD 07 06  ld.sis bc,(ix+queueSize)
+  189 D1:A9D5 B7 -  -  -   or a
+  190 D1:A9D6 40 ED 42 -   sbc.sis hl,bc
+  191 D1:A9D9 D2 DF A9 D1  jp nc,$+6
+  192 D1:A9DD 40 09 -  -   add.sis hl,bc
+  193 D1:A9DF 40 DD 2F 02  ld.sis (ix+queueHead),hl
+  194 D1:A9E3 -  -  -  -  
+  195 D1:A9E3 40 DD 27 04  ld.sis hl,(ix+queueCount)
+  196 D1:A9E7 40 23 -  -   inc.sis hl
+  197 D1:A9E9 40 DD 2F 04  ld.sis (ix+queueCount),hl
+  198 D1:A9ED -  -  -  -  
+  199 D1:A9ED 5B C9 -  -   ret.l
+  200 D1:A9EF -  -  -  -  
+  201 D1:A9EF -  -  -  -  .assume ADL=1
+  202 D1:A9EF -  -  -  -  ;ez80 mode
+  203 D1:A9EF -  -  -  -  ;removes and returns an element at the back
+  204 D1:A9EF -  -  -  -  ;ix = queue
+  205 D1:A9EF -  -  -  -  ;a = element
+  206 D1:A9EF -  -  -  -  ;corrupts hl, bc
+  207 D1:A9EF -  -  -  -  dequeue:
+  208 D1:A9EF 40 DD 07 00  ld.sis bc,(ix+queueTail)
+  209 D1:A9F3 DD 27 08 -   ld hl,(ix+queueArr)
+  210 D1:A9F6 09 -  -  -   add hl,bc
+  211 D1:A9F7 7E -  -  -   ld a,(hl)
+  212 D1:A9F8 -  -  -  -  
+  213 D1:A9F8 -  -  -  -   ;queueTail = (queueTail + 1) % queueSize
+  214 D1:A9F8 40 DD 27 00  ld.sis hl, (ix+queueTail)
+  215 D1:A9FC 40 23 -  -   inc.sis hl
+  216 D1:A9FE 40 DD 07 06  ld.sis bc, (ix+queueSize)
+  217 D1:AA02 B7 -  -  -   or a
+  218 D1:AA03 40 ED 42 -   sbc.sis hl, bc
+  219 D1:AA06 D2 0C AA D1  jp nc, $+6
+  220 D1:AA0A 40 09 -  -   add.sis hl,bc
+  221 D1:AA0C 40 DD 2F 00  ld.sis (ix+queueTail),hl
+  222 D1:AA10 -  -  -  -  
+  223 D1:AA10 40 DD 27 04  ld.sis hl,(ix+queueCount)
+  224 D1:AA14 40 2B -  -   dec.sis hl
+  225 D1:AA16 40 DD 2F 04  ld.sis (ix+queueCount),hl
+  226 D1:AA1A -  -  -  -  
+  227 D1:AA1A 5B C9 -  -   ret.l
+  228 D1:AA1C -  -  -  -  
+  229 D1:AA1C -  -  -  -  .assume ADL=1
+  230 D1:AA1C -  -  -  -  ;ez80 mode
+  231 D1:AA1C -  -  -  -  ;gets random number
+  232 D1:AA1C -  -  -  -  ;b <= a <= c
+  233 D1:AA1C -  -  -  -  ;corrupts ...
+  234 D1:AA1C -  -  -  -  getRandom:
+  235 D1:AA1C -  -  -  -   
+  236 D1:AA1C -  -  -  -  
+  237 D1:AA1C -  -  -  -  .assume ADL=1
+  238 D1:AA1C -  -  -  -  ;ez80 mode
+  239 D1:AA1C -  -  -  -  ;sets dir
+  240 D1:AA1C -  -  -  -  ;de = new dir
+  241 D1:AA1C -  -  -  -  ;corrupts a
+  242 D1:AA1C -  -  -  -  setDir:
+  243 D1:AA1C 7A -  -  -   ld a,d
+  244 D1:AA1D 32 AB A9 D1  ld (dir),a
+  245 D1:AA21 7B -  -  -   ld a,e
+  246 D1:AA22 32 AC A9 D1  ld (dir+1),a
+  247 D1:AA26 -  -  -  -  
+  248 D1:AA26 5B C9 -  -   ret.l
+  249 D1:AA28 -  -  -  -  
+  250 D1:AA28 -  -  -  -  .assume ADL=1
+  251 D1:AA28 -  -  -  -  ;ez80 mode
+  252 D1:AA28 -  -  -  -  ;set background of screen
+  253 D1:AA28 -  -  -  -  ;hl = background color
+  254 D1:AA28 -  -  -  -  ;corrupts hl,de,bc
+  255 D1:AA28 -  -  -  -  background:
+  256 D1:AA28 11 02 00 D4  ld de,vRam+2
+  257 D1:AA2C 22 00 00 D4  ld (vRam),hl
+  258 D1:AA30 21 00 00 D4  ld hl,vRam
+  259 D1:AA34 01 FE 57 02  ld bc,320*240*2-2
+  260 D1:AA38 ED B0 -  -   ldir
+  261 D1:AA3A -  -  -  -  
+  262 D1:AA3A 5B C9 -  -   ret.l
+  263 D1:AA3C -  -  -  -  
+  264 D1:AA3C -  -  -  -  .assume ADL=1
+  265 D1:AA3C -  -  -  -  ;ez80 mode
+  266 D1:AA3C -  -  -  -  ;draws background, snake, and food
+  267 D1:AA3C -  -  -  -  ;ix = queue
+  268 D1:AA3C -  -  -  -  ;corrupts a,hl,de
+  269 D1:AA3C -  -  -  -  draw:
+  270 D1:AA3C 21 00 00 00  ld hl,0
+  271 D1:AA40 5B CD 28 AA 
+              D1 -  -  -   call.il background
+  272 D1:AA45 -  -  -  -   ;ld a,(pos)
+  273 D1:AA45 -  -  -  -   ;ld d,a
+  274 D1:AA45 -  -  -  -   ;ld a,(pos+1)
+  275 D1:AA45 -  -  -  -   ;ld e,a
+  276 D1:AA45 -  -  -  -   ;ld hl,$ffffff
+  277 D1:AA45 -  -  -  -   ;call.il square
+  278 D1:AA45 -  -  -  -  
+  279 D1:AA45 -  -  -  -   ;for(i = queueTail; i != queueHead; i = (i + 2) % queueSize)
+  280 D1:AA45 21 00 00 00  ld hl,0
+  281 D1:AA49 40 DD 27 00  ld.sis hl,(ix+queueTail)
+  282 D1:AA4D -  -  -  -  
+  283 D1:AA4D -  -  -  -  drawLoop:
+  284 D1:AA4D 5B E5 -  -   push.lil hl
+  285 D1:AA4F DD 17 08 -   ld de,(ix+queueArr)
+  286 D1:AA52 19 -  -  -   add hl,de
+  287 D1:AA53 56 -  -  -   ld d,(hl)
+  288 D1:AA54 23 -  -  -   inc hl
+  289 D1:AA55 5E -  -  -   ld e,(hl)
+  290 D1:AA56 21 FF FF FF  ld hl,$ffffff
+  291 D1:AA5A 5B CD 83 AA 
+              D1 -  -  -   call.il square
+  292 D1:AA5F 5B E1 -  -   pop.lil hl
+  293 D1:AA61 -  -  -  -  
+  294 D1:AA61 -  -  -  -   ;hl = (hl + 2) % queueSize
+  295 D1:AA61 40 23 -  -   inc.sis hl
+  296 D1:AA63 40 23 -  -   inc.sis hl
+  297 D1:AA65 40 DD 07 06  ld.sis bc,(ix+queueSize)
+  298 D1:AA69 B7 -  -  -   or a
+  299 D1:AA6A 40 ED 42 -   sbc.sis hl,bc
+  300 D1:AA6D D2 73 AA D1  jp nc,$+6
+  301 D1:AA71 40 09 -  -   add.sis hl,bc
+  302 D1:AA73 -  -  -  -   
+  303 D1:AA73 40 DD 07 02  ld.sis bc,(ix+queueHead)
+  304 D1:AA77 B7 -  -  -   or a
+  305 D1:AA78 40 ED 42 -   sbc.sis hl,bc
+  306 D1:AA7B 40 09 -  -   add.sis hl,bc
+  307 D1:AA7D -  -  -  -  
+  308 D1:AA7D C2 4D AA D1  jp nz,drawLoop
+  309 D1:AA81 -  -  -  -  
+  310 D1:AA81 5B C9 -  -   ret.l
+  311 D1:AA83 -  -  -  -   
+  312 D1:AA83 -  -  -  -  .assume ADL=1
+  313 D1:AA83 -  -  -  -  ;ez80 mode
+  314 D1:AA83 -  -  -  -  ;draws a 10x10 square at (d*10,e*10)
+  315 D1:AA83 -  -  -  -  ;hl = color
+  316 D1:AA83 -  -  -  -  ;corrupts hl,de,bc,a
+  317 D1:AA83 -  -  -  -  square:
+  318 D1:AA83 5B E5 -  -   push.lil hl
+  319 D1:AA85 5B D5 -  -   push.lil de
+  320 D1:AA87 -  -  -  -  
+  321 D1:AA87 -  -  -  -   ;d*10*2
+  322 D1:AA87 7A -  -  -   ld a,d
+  323 D1:AA88 01 00 00 00  ld bc,0
+  324 D1:AA8C 4F -  -  -   ld c,a
+  325 D1:AA8D 11 14 00 00  ld de,10*2
+  326 D1:AA91 49 CD 00 AB  call.is multiply & $ffff
+  327 D1:AA95 -  -  -  -  
+  328 D1:AA95 5B D1 -  -   pop.lil de
+  329 D1:AA97 5B E5 -  -   push.lil hl ;hl = d*10*2
+  330 D1:AA99 7B -  -  -   ld a,e
+  331 D1:AA9A 01 00 00 00  ld bc,0
+  332 D1:AA9E 4F -  -  -   ld c,a
+  333 D1:AA9F 11 00 19 00  ld de,10*320*2
+  334 D1:AAA3 49 CD 00 AB  call.is multiply & $ffff
+  335 D1:AAA7 EB -  -  -   ex de,hl ;hl = e*10*320*2 upper bits, de = lower 16 bits
+  336 D1:AAA8 -  -  -  -  ; hl<<16
+  337 D1:AAA8 29 -  -  -   add hl,hl
+  338 D1:AAA9 29 -  -  -   add hl,hl
+  339 D1:AAAA 29 -  -  -   add hl,hl
+  340 D1:AAAB 29 -  -  -   add hl,hl
+  341 D1:AAAC 29 -  -  -   add hl,hl
+  342 D1:AAAD 29 -  -  -   add hl,hl
+  343 D1:AAAE 29 -  -  -   add hl,hl
+  344 D1:AAAF 29 -  -  -   add hl,hl
+  345 D1:AAB0 29 -  -  -   add hl,hl
+  346 D1:AAB1 29 -  -  -   add hl,hl
+  347 D1:AAB2 29 -  -  -   add hl,hl
+  348 D1:AAB3 29 -  -  -   add hl,hl
+  349 D1:AAB4 29 -  -  -   add hl,hl
+  350 D1:AAB5 29 -  -  -   add hl,hl
+  351 D1:AAB6 29 -  -  -   add hl,hl
+  352 D1:AAB7 29 -  -  -   add hl,hl
+  353 D1:AAB8 -  -  -  -  
+  354 D1:AAB8 -  -  -  -  ;
+  355 D1:AAB8 19 -  -  -   add hl,de
+  356 D1:AAB9 EB -  -  -   ex de,hl
+  357 D1:AABA 5B E1 -  -   pop.lil hl
+  358 D1:AABC EB -  -  -   ex de,hl
+  359 D1:AABD 19 -  -  -   add hl,de
+  360 D1:AABE 11 00 00 D4  ld de,vram
+  361 D1:AAC2 19 -  -  -   add hl,de
+  362 D1:AAC3 -  -  -  -  
+  363 D1:AAC3 -  -  -  -   ;hl = vram + d*10*2 + e*10*320*2
+  364 D1:AAC3 -  -  -  -   ;de = color
+  365 D1:AAC3 5B D1 -  -   pop.lil de
+  366 D1:AAC5 -  -  -  -  
+  367 D1:AAC5 -  -  -  -   ;draw 10 lines
+  368 D1:AAC5 06 0A -  -   ld b,10
+  369 D1:AAC7 -  -  -  -  lineLoop:
+  370 D1:AAC7 5B C5 -  -   push.lil bc
+  371 D1:AAC9 -  -  -  -  
+  372 D1:AAC9 5B E5 -  -   push.lil hl
+  373 D1:AACB 5B D5 -  -   push.lil de
+  374 D1:AACD ED 1F -  -   ld (hl),de
+  375 D1:AACF 5B E5 -  -   push.lil hl
+  376 D1:AAD1 5B D1 -  -   pop.lil de
+  377 D1:AAD3 13 -  -  -   inc de
+  378 D1:AAD4 13 -  -  -   inc de
+  379 D1:AAD5 01 12 00 00  ld bc,2*10-2
+  380 D1:AAD9 ED B0 -  -   ldir
+  381 D1:AADB 5B D1 -  -   pop.lil de
+  382 D1:AADD 5B E1 -  -   pop.lil hl
+  383 D1:AADF 01 80 02 00  ld bc,2*320
+  384 D1:AAE3 09 -  -  -   add hl,bc
+  385 D1:AAE4 -  -  -  -  
+  386 D1:AAE4 5B C1 -  -   pop.lil bc
+  387 D1:AAE6 10 DF -  -   djnz lineLoop
+  388 D1:AAE8 -  -  -  -   
+  389 D1:AAE8 5B C9 -  -   ret.l
+  390 D1:AAEA -  -  -  -  
+  391 D1:AAEA -  -  -  -  .assume ADL=1
+  392 D1:AAEA -  -  -  -  ;source: https://wikiti.brandonw.net/index.php?title=84PCE:Ports:A000
+  393 D1:AAEA -  -  -  -  ;ez80 mode
+  394 D1:AAEA -  -  -  -  ;resets keyboard
+  395 D1:AAEA -  -  -  -  RestoreKeyboard:
+  396 D1:AAEA 21 00 00 F5  ld hl,mpKeyRange
+  397 D1:AAEE AF -  -  -   xor a		; Mode 0
+  398 D1:AAEF 77 -  -  -   ld (hl),a
+  399 D1:AAF0 2C -  -  -   inc l		; 0F50001h
+  400 D1:AAF1 36 0F -  -   ld (hl),15	; Wait 15*256 APB cycles before scanning each row
+  401 D1:AAF3 2C -  -  -   inc l		; 0F50002h
+  402 D1:AAF4 AF -  -  -   xor a
+  403 D1:AAF5 77 -  -  -   ld (hl),a
+  404 D1:AAF6 2C -  -  -   inc l		; 0F50003h
+  405 D1:AAF7 36 0F -  -   ld (hl),15	; Wait 15 APB cycles before each scan
+  406 D1:AAF9 2C -  -  -   inc l		; 0F50004h
+  407 D1:AAFA 3E 08 -  -   ld a,8		; Number of rows to scan
+  408 D1:AAFC 77 -  -  -   ld (hl),a
+  409 D1:AAFD 2C -  -  -   inc l		; 0F50005h
+  410 D1:AAFE 77 -  -  -   ld (hl),a	; Number of columns to scan
+  411 D1:AAFF C9 -  -  -   ret
+  412 D1:AB00 -  -  -  -  
+  413 D1:AB00 -  -  -  -  .assume ADL=0
+  414 D1:AB00 -  -  -  -  ;source: https://wikiti.brandonw.net/index.php?title=Z80_Routines:Math:Multiplication
+  415 D1:AB00 -  -  -  -  ;z80 mode
+  416 D1:AB00 -  -  -  -  ;16 bit signed multiply
+  417 D1:AB00 -  -  -  -  ;bc, de = operands
+  418 D1:AB00 -  -  -  -  ;de:hl = product
+  419 D1:AB00 -  -  -  -  ;corrupts  a
+  420 D1:AB00 -  -  -  -  multiply:
+  421 D1:AB00 AF -  -  -    xor a
+  422 D1:AB01 67 -  -  -    ld h,a
+  423 D1:AB02 6F -  -  -    ld l,a
+  424 D1:AB03 CB 7A -  -    bit 7,d
+  425 D1:AB05 CA 0A AB -    jp z,muldpos & $ffff
+  426 D1:AB08 ED 42 -  -    sbc hl,bc
+  427 D1:AB0A -  -  -  -  muldpos:
+  428 D1:AB0A B0 -  -  -    or b
+  429 D1:AB0B F2 10 AB -    jp p,mulbpos & $ffff
+  430 D1:AB0E ED 52 -  -    sbc hl,de
+  431 D1:AB10 -  -  -  -  mulbpos:
+  432 D1:AB10 3E 10 -  -    ld a,16
+  433 D1:AB12 -  -  -  -  mulloop:
+  434 D1:AB12 29 -  -  -    add hl,hl
+  435 D1:AB13 CB 13 -  -    rl e
+  436 D1:AB15 CB 12 -  -    rl d
+  437 D1:AB17 D2 1F AB -    jp nc,mul0bit & $ffff
+  438 D1:AB1A 09 -  -  -    add hl,bc
+  439 D1:AB1B D2 1F AB -    jp nc,mul0bit & $ffff
+  440 D1:AB1E 13 -  -  -    inc de
+  441 D1:AB1F -  -  -  -  mul0bit:
+  442 D1:AB1F 3D -  -  -    dec a
+  443 D1:AB20 C2 12 AB -    jp nz,mulloop & $ffff
+  444 D1:AB23 -  -  -  -  
+  445 D1:AB23 49 C9 -  -    ret.l
