@@ -1,0 +1,35 @@
+Listing for file "src\time.asm"
+    3 00:0000 -  -  -  -  .list
+    4 00:0000 -  -  -  -   .assume ADL=1
+    5 00:0000 -  -  -  -   .org userMem-2
+    6 D1:A87F EF 7B -  -   .db tExtTok, tAsm84CeCmp
+    7 D1:A881 -  -  -  -  
+    8 D1:A881 -  -  -  -  ;init
+    9 D1:A881 F3 -  -  -   di
+   10 D1:A882 CD 28 08 02  call _HomeUp
+   11 D1:A886 CD 10 08 02  call _ClrScrnFull
+   12 D1:A88A CD 48 08 02  call _RunIndicOff
+   13 D1:A88E -  -  -  -      ;save flags
+   14 D1:A88E F5 -  -  -       push af
+   15 D1:A88F FD E5 -  -       push iy
+   16 D1:A891 -  -  -  -  
+   17 D1:A891 -  -  -  -  main:
+   18 D1:A891 3A 00 00 F3  ld a,(mpRtcRange)
+   19 D1:A895 21 00 00 00  ld hl,0
+   20 D1:A899 6F -  -  -   ld l,a
+   21 D1:A89A F5 -  -  -   push af
+   22 D1:A89B CD E0 1E 02  call _DispHL
+   23 D1:A89F CD F0 07 02  call _NewLine
+   24 D1:A8A3 F1 -  -  -   pop af
+   25 D1:A8A4 FE 28 -  -   cp a,40
+   26 D1:A8A6 CA AE A8 D1  jp z,exit
+   27 D1:A8AA C3 91 A8 D1  jp main
+   28 D1:A8AE -  -  -  -  
+   29 D1:A8AE -  -  -  -  exit:
+   30 D1:A8AE FD E1 -  -   pop iy
+   31 D1:A8B0 F1 -  -  -   pop af
+   32 D1:A8B1 CD 8C 0D 02  call _GetKey
+   33 D1:A8B5 CD 10 08 02  call _ClrScrnFull
+   34 D1:A8B9 CD 28 08 02  call _HomeUp
+   35 D1:A8BD FD CB 00 AE  res donePrgm, (iy+doneFlags)
+   36 D1:A8C1 C9 -  -  -   ret
