@@ -1,5 +1,5 @@
     1 00:0000 -  -  -  -  #include "includes\ti84pce.inc"
-Listing for file "C:\Users\phizz\Programs\TI 84 Plus CE\Assembly\ASM Assembler\includes\ti84pce.inc"
+Listing for file "/workspaces/TI84PCE/includes/ti84pce.inc"
     1 00:0000 -  -  -  -  ;TI-84 Plus CE Include File
     2 00:0000 -  -  -  -  
     3 00:0000 -  -  -  -  ;Various Parts Contributed by
@@ -10,7 +10,7 @@ Listing for file "C:\Users\phizz\Programs\TI 84 Plus CE\Assembly\ASM Assembler\i
     8 00:0000 -  -  -  -  ;- tr1p1ea
     9 00:0000 -  -  -  -  ;- Kerm Martian
    10 00:0000 -  -  -  -  ;- Texas Instruments (ti83plus.inc)
-Listing for file "hello.asm"
+Listing for file "src/hello.asm"
     2 00:0000 -  -  -  -  
     3 00:0000 -  -  -  -   .assume ADL=1
     4 00:0000 -  -  -  -   .org userMem-2

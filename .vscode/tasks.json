@@ -4,7 +4,7 @@
       {
         "label": "build",
         "type": "shell",
-        "command": "echo hello | cmd.exe /c 'build.bat'",
+        "command": "echo hello | ./build.sh",
         "group": {
           "kind": "build",
           "isDefault": true
