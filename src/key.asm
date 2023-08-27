@@ -1,5 +1,5 @@
 .nolist
-#include "../includes/ti84pce.inc"
+#include "/includes/ti84pce.inc"
 .list
  .assume ADL=1
  .org userMem-2

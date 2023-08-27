@@ -1,5 +1,5 @@
 .nolist
-#include "../includes/ti84pce.inc"
+#include "/includes/ti84pce.inc"
 queueTail equ 0
 queueHead equ 2
 queueCount equ 4

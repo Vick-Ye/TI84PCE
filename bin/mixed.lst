@@ -1,4 +1,4 @@
-Listing for file "src\mixed.asm"
+Listing for file "src/mixed.asm"
     3 00:0000 -  -  -  -  .list
     4 00:0000 -  -  -  -   .assume ADL=1
     5 00:0000 -  -  -  -   .org userMem-2
@@ -20,304 +20,303 @@ Listing for file "src\mixed.asm"
    21 D1:A899 3E D1 -  -   ld a,$d1
    22 D1:A89B ED 6D -  -   ld mb,a
    23 D1:A89D -  -  -  -  
-   24 D1:A89D CD 38 10 02  call _RandInit
-   25 D1:A8A1 CD 30 10 02  call _Random
-   26 D1:A8A5 21 F8 05 D0  ld hl,OP1
-   27 D1:A8A9 CD 29 A9 D1  call dispFloat
-   28 D1:A8AD -  -  -  -  
-   29 D1:A8AD ED 7E -  -   rsmix
-   30 D1:A8AF -  -  -  -  
-   31 D1:A8AF -  -  -  -  exit:
-   32 D1:A8AF -  -  -  -   ;restore flags
-   33 D1:A8AF FD E1 -  -       pop iy
-   34 D1:A8B1 F1 -  -  -       pop af
-   35 D1:A8B2 ED 6D -  -   ld mb,a
-   36 D1:A8B4 FB -  -  -   ei
-   37 D1:A8B5 CD 8C 0D 02  call _GetKey
-   38 D1:A8B9 CD 10 08 02  call _ClrScrnFull
-   39 D1:A8BD CD 28 08 02  call _HomeUp
-   40 D1:A8C1 FD CB 00 AE  res donePrgm,(iy+doneFlags)
-   41 D1:A8C5 C9 -  -  -   ret
-   42 D1:A8C6 -  -  -  -  
-   43 D1:A8C6 -  -  -  -  float:
-   44 D1:A8C6 00 80 27 18 
+   24 D1:A89D CD 30 10 02  call _Random
+   25 D1:A8A1 21 F8 05 D0  ld hl,OP1
+   26 D1:A8A5 CD 25 A9 D1  call dispFloat
+   27 D1:A8A9 -  -  -  -  
+   28 D1:A8A9 ED 7E -  -   rsmix
+   29 D1:A8AB -  -  -  -  
+   30 D1:A8AB -  -  -  -  exit:
+   31 D1:A8AB -  -  -  -   ;restore flags
+   32 D1:A8AB FD E1 -  -       pop iy
+   33 D1:A8AD F1 -  -  -       pop af
+   34 D1:A8AE ED 6D -  -   ld mb,a
+   35 D1:A8B0 FB -  -  -   ei
+   36 D1:A8B1 CD 8C 0D 02  call _GetKey
+   37 D1:A8B5 CD 10 08 02  call _ClrScrnFull
+   38 D1:A8B9 CD 28 08 02  call _HomeUp
+   39 D1:A8BD FD CB 00 AE  res donePrgm,(iy+doneFlags)
+   40 D1:A8C1 C9 -  -  -   ret
+   41 D1:A8C2 -  -  -  -  
+   42 D1:A8C2 -  -  -  -  float:
+   43 D1:A8C2 00 80 27 18 
               28 18 28 45 
               94 -  -  -   .db $00, $80, $27, $18, $28, $18, $28, $45, $94
-   45 D1:A8CF -  -  -  -  
-   46 D1:A8CF -  -  -  -  .assume ADL=1
-   47 D1:A8CF -  -  -  -  ;ez80 mode
-   48 D1:A8CF -  -  -  -  ;gets random number
-   49 D1:A8CF -  -  -  -  ;b <= a <= c
-   50 D1:A8CF -  -  -  -  ;corrupts ...
-   51 D1:A8CF -  -  -  -  getRandom:
-   52 D1:A8CF -  -  -  -   ;[0,1) * (c-b+1) + b = [b,c]
-   53 D1:A8CF -  -  -  -   ;c => op1
-   54 D1:A8CF -  -  -  -   ;b => op2
-   55 D1:A8CF -  -  -  -   ;op1 -= op2
-   56 D1:A8CF -  -  -  -   ;1 => op2
-   57 D1:A8CF -  -  -  -   ;op1 += op2
-   58 D1:A8CF -  -  -  -   ;ld op2,op1
-   59 D1:A8CF -  -  -  -   ;rand => op1
-   60 D1:A8CF -  -  -  -   ;op1 * op2
-   61 D1:A8CF -  -  -  -   ;b -> op2
-   62 D1:A8CF -  -  -  -   ;op1 += op2
-   63 D1:A8CF -  -  -  -   ;int(op1)
-   64 D1:A8CF -  -  -  -  
-   65 D1:A8CF 5B C5 -  -   push.lil bc
-   66 D1:A8D1 79 -  -  -   ld a,c
-   67 D1:A8D2 21 F8 05 D0  ld hl,OP1
-   68 D1:A8D6 CD C1 A9 D1  call intToFloat
-   69 D1:A8DA 5B C1 -  -   pop.lil bc
-   70 D1:A8DC 5B C5 -  -   push.lil bc
-   71 D1:A8DE 78 -  -  -   ld a,b
-   72 D1:A8DF 21 03 06 D0  ld hl,OP2
-   73 D1:A8E3 CD C1 A9 D1  call intToFloat
-   74 D1:A8E7 CD BC 01 02  call _FPSub
-   75 D1:A8EB 3E 01 -  -   ld a,1
-   76 D1:A8ED 21 03 06 D0  ld hl,OP2
-   77 D1:A8F1 CD C1 A9 D1  call intToFloat
-   78 D1:A8F5 CD C0 01 02  call _FPAdd
-   79 D1:A8F9 21 F8 05 D0  ld hl,OP1
-   80 D1:A8FD 11 03 06 D0  ld de,OP2
-   81 D1:A901 CD BA A9 D1  call ldFloat
-   82 D1:A905 CD 30 10 02  call _Random
-   83 D1:A909 CD D8 01 02  call _FPMult
-   84 D1:A90D 5B C1 -  -   pop.lil bc
-   85 D1:A90F 78 -  -  -   ld a,b
-   86 D1:A910 21 03 06 D0  ld hl,OP2
-   87 D1:A914 CD C1 A9 D1  call intToFloat
-   88 D1:A918 CD C0 01 02  call _FPAdd
-   89 D1:A91C CD A4 01 02  call _Intgr
-   90 D1:A920 -  -  -  -  
-   91 D1:A920 21 F8 05 D0  ld hl,OP1
-   92 D1:A924 CD 19 AA D1  call floatToInt
-   93 D1:A928 -  -  -  -  
-   94 D1:A928 -  -  -  -  
-   95 D1:A928 C9 -  -  -   ret
-   96 D1:A929 -  -  -  -  
-   97 D1:A929 -  -  -  -  .assume ADL=1
-   98 D1:A929 -  -  -  -  ;ez80 mode
-   99 D1:A929 -  -  -  -  ;displays a float
-  100 D1:A929 -  -  -  -  ;hl = OP(x)
-  101 D1:A929 -  -  -  -  ;corrupts hl,bc,de,a
-  102 D1:A929 -  -  -  -  dispFloat:
-  103 D1:A929 23 -  -  -   inc hl
-  104 D1:A92A 01 00 00 00  ld bc,0
-  105 D1:A92E 7E -  -  -   ld a,(hl)
-  106 D1:A92F 0E 80 -  -   ld c,$80
-  107 D1:A931 B9 -  -  -   cp a,c
-  108 D1:A932 DA 4B A9 D1  jp c,negDecimalPt
-  109 D1:A936 91 -  -  -   sub a,c
-  110 D1:A937 4F -  -  -   ld c,a
-  111 D1:A938 23 -  -  -   inc hl
-  112 D1:A939 11 AA A9 D1  ld de,dispFloatVar
-  113 D1:A93D EB -  -  -   ex de,hl
-  114 D1:A93E 09 -  -  -   add hl,bc
-  115 D1:A93F 23 -  -  -   inc hl
-  116 D1:A940 36 2E -  -   ld (hl),$2e
-  117 D1:A942 EB -  -  -   ex de,hl
-  118 D1:A943 11 AA A9 D1  ld de,dispFloatVar
-  119 D1:A947 C3 65 A9 D1  jp dispFloatLoopBegin
-  120 D1:A94B -  -  -  -  negDecimalPt:
-  121 D1:A94B 5B D5 -  -   push.lil de
-  122 D1:A94D 57 -  -  -   ld d,a
-  123 D1:A94E 79 -  -  -   ld a,c
-  124 D1:A94F 4A -  -  -   ld c,d
-  125 D1:A950 5B D1 -  -   pop.lil de
-  126 D1:A952 91 -  -  -   sub a,c
-  127 D1:A953 4F -  -  -   ld c,a
-  128 D1:A954 23 -  -  -   inc hl
-  129 D1:A955 11 AA A9 D1  ld de,dispFloatVar
-  130 D1:A959 EB -  -  -   ex de,hl
-  131 D1:A95A B7 -  -  -   or a
-  132 D1:A95B ED 42 -  -   sbc hl,bc
-  133 D1:A95D 23 -  -  -   inc hl
-  134 D1:A95E 36 2E -  -   ld (hl),$2e
-  135 D1:A960 EB -  -  -   ex de,hl
-  136 D1:A961 11 AA A9 D1  ld de,dispFloatVar
-  137 D1:A965 -  -  -  -   
-  138 D1:A965 -  -  -  -  dispFloatLoopBegin:
-  139 D1:A965 06 07 -  -   ld b,7
-  140 D1:A967 1A -  -  -   ld a,(de)
-  141 D1:A968 0E 2E -  -   ld c,$2e
-  142 D1:A96A B9 -  -  -   cp a,c
-  143 D1:A96B C2 70 A9 D1  jp nz,$+5
-  144 D1:A96F 13 -  -  -   inc de
-  145 D1:A970 -  -  -  -  dispFloatLoop:
-  146 D1:A970 -  -  -  -  
-  147 D1:A970 7E -  -  -   ld a,(hl)
-  148 D1:A971 -  -  -  -  ;a >> 4
-  149 D1:A971 CB 3F -  -   srl a
-  150 D1:A973 CB 3F -  -   srl a
-  151 D1:A975 CB 3F -  -   srl a
-  152 D1:A977 CB 3F -  -   srl a
-  153 D1:A979 -  -  -  -  ;
-  154 D1:A979 0E 30 -  -   ld c,$30
-  155 D1:A97B 81 -  -  -   add a,c
-  156 D1:A97C 12 -  -  -   ld (de), a
-  157 D1:A97D 13 -  -  -   inc de
-  158 D1:A97E 1A -  -  -   ld a,(de)
-  159 D1:A97F 0E 2E -  -   ld c,$2e
-  160 D1:A981 B9 -  -  -   cp a,c
-  161 D1:A982 C2 87 A9 D1  jp nz,$+5
-  162 D1:A986 13 -  -  -   inc de
-  163 D1:A987 -  -  -  -  
-  164 D1:A987 7E -  -  -   ld a,(hl)
-  165 D1:A988 -  -  -  -  ;res upper 4 bits of a
-  166 D1:A988 CB BF -  -   res 7,a
-  167 D1:A98A CB B7 -  -   res 6,a
-  168 D1:A98C CB AF -  -   res 5,a
-  169 D1:A98E CB A7 -  -   res 4,a
-  170 D1:A990 -  -  -  -  ;
-  171 D1:A990 0E 30 -  -   ld c,$30
-  172 D1:A992 81 -  -  -   add a,c
-  173 D1:A993 12 -  -  -   ld (de),a
-  174 D1:A994 23 -  -  -   inc hl
-  175 D1:A995 13 -  -  -   inc de
-  176 D1:A996 1A -  -  -   ld a,(de)
-  177 D1:A997 0E 2E -  -   ld c,$2e
-  178 D1:A999 B9 -  -  -   cp a,c
-  179 D1:A99A C2 9F A9 D1  jp nz,$+5
-  180 D1:A99E 13 -  -  -   inc de
-  181 D1:A99F -  -  -  -  
-  182 D1:A99F 10 CF -  -   djnz dispFloatLoop
-  183 D1:A9A1 -  -  -  -  
-  184 D1:A9A1 21 AA A9 D1  ld hl,dispFloatVar
-  185 D1:A9A5 CD C0 07 02  call _PutS
-  186 D1:A9A9 -  -  -  -  
-  187 D1:A9A9 C9 -  -  -   ret
-  188 D1:A9AA -  -  -  -  
-  189 D1:A9AA -  -  -  -  dispFloatVar:
-  190 D1:A9AA 30 30 30 30 
+   44 D1:A8CB -  -  -  -  
+   45 D1:A8CB -  -  -  -  .assume ADL=1
+   46 D1:A8CB -  -  -  -  ;ez80 mode
+   47 D1:A8CB -  -  -  -  ;gets random number
+   48 D1:A8CB -  -  -  -  ;b <= a <= c
+   49 D1:A8CB -  -  -  -  ;corrupts ...
+   50 D1:A8CB -  -  -  -  getRandom:
+   51 D1:A8CB -  -  -  -   ;[0,1) * (c-b+1) + b = [b,c]
+   52 D1:A8CB -  -  -  -   ;c => op1
+   53 D1:A8CB -  -  -  -   ;b => op2
+   54 D1:A8CB -  -  -  -   ;op1 -= op2
+   55 D1:A8CB -  -  -  -   ;1 => op2
+   56 D1:A8CB -  -  -  -   ;op1 += op2
+   57 D1:A8CB -  -  -  -   ;ld op2,op1
+   58 D1:A8CB -  -  -  -   ;rand => op1
+   59 D1:A8CB -  -  -  -   ;op1 * op2
+   60 D1:A8CB -  -  -  -   ;b -> op2
+   61 D1:A8CB -  -  -  -   ;op1 += op2
+   62 D1:A8CB -  -  -  -   ;int(op1)
+   63 D1:A8CB -  -  -  -  
+   64 D1:A8CB 5B C5 -  -   push.lil bc
+   65 D1:A8CD 79 -  -  -   ld a,c
+   66 D1:A8CE 21 F8 05 D0  ld hl,OP1
+   67 D1:A8D2 CD BD A9 D1  call intToFloat
+   68 D1:A8D6 5B C1 -  -   pop.lil bc
+   69 D1:A8D8 5B C5 -  -   push.lil bc
+   70 D1:A8DA 78 -  -  -   ld a,b
+   71 D1:A8DB 21 03 06 D0  ld hl,OP2
+   72 D1:A8DF CD BD A9 D1  call intToFloat
+   73 D1:A8E3 CD BC 01 02  call _FPSub
+   74 D1:A8E7 3E 01 -  -   ld a,1
+   75 D1:A8E9 21 03 06 D0  ld hl,OP2
+   76 D1:A8ED CD BD A9 D1  call intToFloat
+   77 D1:A8F1 CD C0 01 02  call _FPAdd
+   78 D1:A8F5 21 F8 05 D0  ld hl,OP1
+   79 D1:A8F9 11 03 06 D0  ld de,OP2
+   80 D1:A8FD CD B6 A9 D1  call ldFloat
+   81 D1:A901 CD 30 10 02  call _Random
+   82 D1:A905 CD D8 01 02  call _FPMult
+   83 D1:A909 5B C1 -  -   pop.lil bc
+   84 D1:A90B 78 -  -  -   ld a,b
+   85 D1:A90C 21 03 06 D0  ld hl,OP2
+   86 D1:A910 CD BD A9 D1  call intToFloat
+   87 D1:A914 CD C0 01 02  call _FPAdd
+   88 D1:A918 CD A4 01 02  call _Intgr
+   89 D1:A91C -  -  -  -  
+   90 D1:A91C 21 F8 05 D0  ld hl,OP1
+   91 D1:A920 CD 15 AA D1  call floatToInt
+   92 D1:A924 -  -  -  -  
+   93 D1:A924 -  -  -  -  
+   94 D1:A924 C9 -  -  -   ret
+   95 D1:A925 -  -  -  -  
+   96 D1:A925 -  -  -  -  .assume ADL=1
+   97 D1:A925 -  -  -  -  ;ez80 mode
+   98 D1:A925 -  -  -  -  ;displays a float
+   99 D1:A925 -  -  -  -  ;hl = OP(x)
+  100 D1:A925 -  -  -  -  ;corrupts hl,bc,de,a
+  101 D1:A925 -  -  -  -  dispFloat:
+  102 D1:A925 23 -  -  -   inc hl
+  103 D1:A926 01 00 00 00  ld bc,0
+  104 D1:A92A 7E -  -  -   ld a,(hl)
+  105 D1:A92B 0E 80 -  -   ld c,$80
+  106 D1:A92D B9 -  -  -   cp a,c
+  107 D1:A92E DA 47 A9 D1  jp c,negDecimalPt
+  108 D1:A932 91 -  -  -   sub a,c
+  109 D1:A933 4F -  -  -   ld c,a
+  110 D1:A934 23 -  -  -   inc hl
+  111 D1:A935 11 A6 A9 D1  ld de,dispFloatVar
+  112 D1:A939 EB -  -  -   ex de,hl
+  113 D1:A93A 09 -  -  -   add hl,bc
+  114 D1:A93B 23 -  -  -   inc hl
+  115 D1:A93C 36 2E -  -   ld (hl),$2e
+  116 D1:A93E EB -  -  -   ex de,hl
+  117 D1:A93F 11 A6 A9 D1  ld de,dispFloatVar
+  118 D1:A943 C3 61 A9 D1  jp dispFloatLoopBegin
+  119 D1:A947 -  -  -  -  negDecimalPt:
+  120 D1:A947 5B D5 -  -   push.lil de
+  121 D1:A949 57 -  -  -   ld d,a
+  122 D1:A94A 79 -  -  -   ld a,c
+  123 D1:A94B 4A -  -  -   ld c,d
+  124 D1:A94C 5B D1 -  -   pop.lil de
+  125 D1:A94E 91 -  -  -   sub a,c
+  126 D1:A94F 4F -  -  -   ld c,a
+  127 D1:A950 23 -  -  -   inc hl
+  128 D1:A951 11 A6 A9 D1  ld de,dispFloatVar
+  129 D1:A955 EB -  -  -   ex de,hl
+  130 D1:A956 B7 -  -  -   or a
+  131 D1:A957 ED 42 -  -   sbc hl,bc
+  132 D1:A959 23 -  -  -   inc hl
+  133 D1:A95A 36 2E -  -   ld (hl),$2e
+  134 D1:A95C EB -  -  -   ex de,hl
+  135 D1:A95D 11 A6 A9 D1  ld de,dispFloatVar
+  136 D1:A961 -  -  -  -   
+  137 D1:A961 -  -  -  -  dispFloatLoopBegin:
+  138 D1:A961 06 07 -  -   ld b,7
+  139 D1:A963 1A -  -  -   ld a,(de)
+  140 D1:A964 0E 2E -  -   ld c,$2e
+  141 D1:A966 B9 -  -  -   cp a,c
+  142 D1:A967 C2 6C A9 D1  jp nz,$+5
+  143 D1:A96B 13 -  -  -   inc de
+  144 D1:A96C -  -  -  -  dispFloatLoop:
+  145 D1:A96C -  -  -  -  
+  146 D1:A96C 7E -  -  -   ld a,(hl)
+  147 D1:A96D -  -  -  -  ;a >> 4
+  148 D1:A96D CB 3F -  -   srl a
+  149 D1:A96F CB 3F -  -   srl a
+  150 D1:A971 CB 3F -  -   srl a
+  151 D1:A973 CB 3F -  -   srl a
+  152 D1:A975 -  -  -  -  ;
+  153 D1:A975 0E 30 -  -   ld c,$30
+  154 D1:A977 81 -  -  -   add a,c
+  155 D1:A978 12 -  -  -   ld (de), a
+  156 D1:A979 13 -  -  -   inc de
+  157 D1:A97A 1A -  -  -   ld a,(de)
+  158 D1:A97B 0E 2E -  -   ld c,$2e
+  159 D1:A97D B9 -  -  -   cp a,c
+  160 D1:A97E C2 83 A9 D1  jp nz,$+5
+  161 D1:A982 13 -  -  -   inc de
+  162 D1:A983 -  -  -  -  
+  163 D1:A983 7E -  -  -   ld a,(hl)
+  164 D1:A984 -  -  -  -  ;res upper 4 bits of a
+  165 D1:A984 CB BF -  -   res 7,a
+  166 D1:A986 CB B7 -  -   res 6,a
+  167 D1:A988 CB AF -  -   res 5,a
+  168 D1:A98A CB A7 -  -   res 4,a
+  169 D1:A98C -  -  -  -  ;
+  170 D1:A98C 0E 30 -  -   ld c,$30
+  171 D1:A98E 81 -  -  -   add a,c
+  172 D1:A98F 12 -  -  -   ld (de),a
+  173 D1:A990 23 -  -  -   inc hl
+  174 D1:A991 13 -  -  -   inc de
+  175 D1:A992 1A -  -  -   ld a,(de)
+  176 D1:A993 0E 2E -  -   ld c,$2e
+  177 D1:A995 B9 -  -  -   cp a,c
+  178 D1:A996 C2 9B A9 D1  jp nz,$+5
+  179 D1:A99A 13 -  -  -   inc de
+  180 D1:A99B -  -  -  -  
+  181 D1:A99B 10 CF -  -   djnz dispFloatLoop
+  182 D1:A99D -  -  -  -  
+  183 D1:A99D 21 A6 A9 D1  ld hl,dispFloatVar
+  184 D1:A9A1 CD C0 07 02  call _PutS
+  185 D1:A9A5 -  -  -  -  
+  186 D1:A9A5 C9 -  -  -   ret
+  187 D1:A9A6 -  -  -  -  
+  188 D1:A9A6 -  -  -  -  dispFloatVar:
+  189 D1:A9A6 30 30 30 30 
               30 30 30 30 
               30 30 30 30 
               30 30 30 -   .db $30,$30,$30,$30,$30,$30,$30,$30,$30,$30,$30,$30,$30,$30,$30 ;float digits (one extra for decimal point)
-  191 D1:A9B9 00 -  -  -   .db 0
-  192 D1:A9BA -  -  -  -  
-  193 D1:A9BA -  -  -  -  .assume ADL=1
-  194 D1:A9BA -  -  -  -  ;ez80 mode
-  195 D1:A9BA -  -  -  -  ;ld OP(x), OP(y)
-  196 D1:A9BA -  -  -  -  ;de = OP(x)
-  197 D1:A9BA -  -  -  -  ;hl = OP(y)
-  198 D1:A9BA -  -  -  -  ;corrupts hl,de,bc
-  199 D1:A9BA -  -  -  -  ldFloat:
-  200 D1:A9BA 01 0C 00 00  ld bc,12
-  201 D1:A9BE ED B0 -  -   ldir
-  202 D1:A9C0 -  -  -  -  
-  203 D1:A9C0 C9 -  -  -   ret
-  204 D1:A9C1 -  -  -  -  
-  205 D1:A9C1 -  -  -  -  .assume ADL=1
-  206 D1:A9C1 -  -  -  -  ;ez80 mode
-  207 D1:A9C1 -  -  -  -  ;converts int to float
-  208 D1:A9C1 -  -  -  -  ;a = int
-  209 D1:A9C1 -  -  -  -  ;hl = OP(x)
-  210 D1:A9C1 -  -  -  -  ;corrupts hl,bc, de, a
-  211 D1:A9C1 -  -  -  -  intToFloat:
-  212 D1:A9C1 36 00 -  -   ld (hl),0 ;positive real number
-  213 D1:A9C3 -  -  -  -  
-  214 D1:A9C3 -  -  -  -   ;zero out entire float
-  215 D1:A9C3 5B E5 -  -   push.lil hl
-  216 D1:A9C5 5B D1 -  -   pop.lil de
-  217 D1:A9C7 23 -  -  -   inc hl
-  218 D1:A9C8 5B E5 -  -   push.lil hl
-  219 D1:A9CA EB -  -  -   ex de,hl
-  220 D1:A9CB 01 09 00 00  ld bc,9
-  221 D1:A9CF ED B0 -  -   ldir
-  222 D1:A9D1 5B E1 -  -   pop.lil hl
-  223 D1:A9D3 -  -  -  -   
-  224 D1:A9D3 57 -  -  -   ld d,a
-  225 D1:A9D4 06 00 -  -   ld b,0
-  226 D1:A9D6 1E 0A -  -   ld e,10
-  227 D1:A9D8 -  -  -  -  divBy10Loop:
-  228 D1:A9D8 5B C5 -  -   push.lil bc
-  229 D1:A9DA CD 19 AA D1  call div_d_e
-  230 D1:A9DE 5B C1 -  -   pop.lil bc
-  231 D1:A9E0 04 -  -  -   inc b
-  232 D1:A9E1 5B F5 -  -   push.lil af
-  233 D1:A9E3 -  -  -  -  
-  234 D1:A9E3 7A -  -  -   ld a,d
-  235 D1:A9E4 B7 -  -  -   or a
-  236 D1:A9E5 C2 D8 A9 D1  jp nz,divBy10Loop
-  237 D1:A9E9 -  -  -  -  
-  238 D1:A9E9 05 -  -  -   dec b
-  239 D1:A9EA 3E 80 -  -   ld a,$80
-  240 D1:A9EC 80 -  -  -   add a,b
-  241 D1:A9ED 77 -  -  -   ld (hl),a
-  242 D1:A9EE -  -  -  -   
-  243 D1:A9EE 23 -  -  -   inc hl 
-  244 D1:A9EF 48 -  -  -   ld c,b ;track b for even odd cmp
-  245 D1:A9F0 -  -  -  -   
-  246 D1:A9F0 AF -  -  -   xor a
-  247 D1:A9F1 B8 -  -  -   cp a,b ;check for zero skip
-  248 D1:A9F2 CA 11 AA D1  jp z,oddDigits
-  249 D1:A9F6 -  -  -  -  
-  250 D1:A9F6 -  -  -  -  insertNumberLoop:
-  251 D1:A9F6 5B F1 -  -   pop.lil af
-  252 D1:A9F8 -  -  -  -  ;a << 4
-  253 D1:A9F8 87 -  -  -   add a,a
-  254 D1:A9F9 87 -  -  -   add a,a
-  255 D1:A9FA 87 -  -  -   add a,a
-  256 D1:A9FB 87 -  -  -   add a,a
-  257 D1:A9FC -  -  -  -  ;
-  258 D1:A9FC 57 -  -  -   ld d,a
-  259 D1:A9FD 5B F1 -  -   pop.lil af
-  260 D1:A9FF 82 -  -  -   add a,d
-  261 D1:AA00 77 -  -  -   ld (hl),a
-  262 D1:AA01 23 -  -  -   inc hl
-  263 D1:AA02 -  -  -  -  
-  264 D1:AA02 05 -  -  -   dec b
-  265 D1:AA03 3E 01 -  -   ld a,1
-  266 D1:AA05 B8 -  -  -   cp a,b
-  267 D1:AA06 05 -  -  -   dec b
-  268 D1:AA07 DA F6 A9 D1  jp c,insertNumberLoop
-  269 D1:AA0B -  -  -  -  
-  270 D1:AA0B CB 41 -  -   bit 0,c
-  271 D1:AA0D C2 18 AA D1  jp nz,evenDigits
-  272 D1:AA11 -  -  -  -  
-  273 D1:AA11 -  -  -  -  oddDigits:
-  274 D1:AA11 5B F1 -  -   pop.lil af
-  275 D1:AA13 -  -  -  -  ;a << 4
-  276 D1:AA13 87 -  -  -   add a,a
-  277 D1:AA14 87 -  -  -   add a,a
-  278 D1:AA15 87 -  -  -   add a,a
-  279 D1:AA16 87 -  -  -   add a,a
-  280 D1:AA17 -  -  -  -  ;
-  281 D1:AA17 77 -  -  -   ld (hl),a
-  282 D1:AA18 -  -  -  -  evenDigits:
-  283 D1:AA18 -  -  -  -   
-  284 D1:AA18 C9 -  -  -   ret
-  285 D1:AA19 -  -  -  -   
-  286 D1:AA19 -  -  -  -  
-  287 D1:AA19 -  -  -  -  .assume ADL=1
-  288 D1:AA19 -  -  -  -  ;ez80 mode
-  289 D1:AA19 -  -  -  -  ;load float into int
-  290 D1:AA19 -  -  -  -  ;a = float
-  291 D1:AA19 -  -  -  -  ;hl = OP(x)
-  292 D1:AA19 -  -  -  -  ;corrupts ...
-  293 D1:AA19 -  -  -  -  FloatToInt:
-  294 D1:AA19 -  -  -  -   
-  295 D1:AA19 -  -  -  -  
-  296 D1:AA19 -  -  -  -  .assume ADL=1
-  297 D1:AA19 -  -  -  -  ;source: https://wikiti.brandonw.net/index.php?title=Z80_Routines:Math:Division
-  298 D1:AA19 -  -  -  -  ;z80 mode
-  299 D1:AA19 -  -  -  -  ;8 bit division
-  300 D1:AA19 -  -  -  -  ;d = divisor
-  301 D1:AA19 -  -  -  -  ;e = dividend
-  302 D1:AA19 -  -  -  -  ;d = quotient
-  303 D1:AA19 -  -  -  -  ;a = remainder
-  304 D1:AA19 -  -  -  -  ;corrupts b
-  305 D1:AA19 -  -  -  -  div_d_e:
-  306 D1:AA19 AF -  -  -     xor	a
-  307 D1:AA1A 06 08 -  -     ld	b, 8
-  308 D1:AA1C -  -  -  -  
-  309 D1:AA1C -  -  -  -  _loop:
-  310 D1:AA1C CB 22 -  -     sla	d
-  311 D1:AA1E 17 -  -  -     rla
-  312 D1:AA1F BB -  -  -     cp	e
-  313 D1:AA20 38 02 -  -     jr	c, $+4
-  314 D1:AA22 93 -  -  -     sub	e
-  315 D1:AA23 14 -  -  -     inc	d
-  316 D1:AA24 -  -  -  -     
-  317 D1:AA24 10 F6 -  -     djnz	_loop
-  318 D1:AA26 -  -  -  -     
-  319 D1:AA26 C9 -  -  -     ret
+  190 D1:A9B5 00 -  -  -   .db 0
+  191 D1:A9B6 -  -  -  -  
+  192 D1:A9B6 -  -  -  -  .assume ADL=1
+  193 D1:A9B6 -  -  -  -  ;ez80 mode
+  194 D1:A9B6 -  -  -  -  ;ld OP(x), OP(y)
+  195 D1:A9B6 -  -  -  -  ;de = OP(x)
+  196 D1:A9B6 -  -  -  -  ;hl = OP(y)
+  197 D1:A9B6 -  -  -  -  ;corrupts hl,de,bc
+  198 D1:A9B6 -  -  -  -  ldFloat:
+  199 D1:A9B6 01 0C 00 00  ld bc,12
+  200 D1:A9BA ED B0 -  -   ldir
+  201 D1:A9BC -  -  -  -  
+  202 D1:A9BC C9 -  -  -   ret
+  203 D1:A9BD -  -  -  -  
+  204 D1:A9BD -  -  -  -  .assume ADL=1
+  205 D1:A9BD -  -  -  -  ;ez80 mode
+  206 D1:A9BD -  -  -  -  ;converts int to float
+  207 D1:A9BD -  -  -  -  ;a = int
+  208 D1:A9BD -  -  -  -  ;hl = OP(x)
+  209 D1:A9BD -  -  -  -  ;corrupts hl,bc,de,a
+  210 D1:A9BD -  -  -  -  intToFloat:
+  211 D1:A9BD 36 00 -  -   ld (hl),0 ;positive real number
+  212 D1:A9BF -  -  -  -  
+  213 D1:A9BF -  -  -  -   ;zero out entire float
+  214 D1:A9BF 5B E5 -  -   push.lil hl
+  215 D1:A9C1 5B D1 -  -   pop.lil de
+  216 D1:A9C3 23 -  -  -   inc hl
+  217 D1:A9C4 5B E5 -  -   push.lil hl
+  218 D1:A9C6 EB -  -  -   ex de,hl
+  219 D1:A9C7 01 09 00 00  ld bc,9
+  220 D1:A9CB ED B0 -  -   ldir
+  221 D1:A9CD 5B E1 -  -   pop.lil hl
+  222 D1:A9CF -  -  -  -   
+  223 D1:A9CF 57 -  -  -   ld d,a
+  224 D1:A9D0 06 00 -  -   ld b,0
+  225 D1:A9D2 1E 0A -  -   ld e,10
+  226 D1:A9D4 -  -  -  -  divBy10Loop:
+  227 D1:A9D4 5B C5 -  -   push.lil bc
+  228 D1:A9D6 CD 15 AA D1  call div_d_e
+  229 D1:A9DA 5B C1 -  -   pop.lil bc
+  230 D1:A9DC 04 -  -  -   inc b
+  231 D1:A9DD 5B F5 -  -   push.lil af
+  232 D1:A9DF -  -  -  -  
+  233 D1:A9DF 7A -  -  -   ld a,d
+  234 D1:A9E0 B7 -  -  -   or a
+  235 D1:A9E1 C2 D4 A9 D1  jp nz,divBy10Loop
+  236 D1:A9E5 -  -  -  -  
+  237 D1:A9E5 05 -  -  -   dec b
+  238 D1:A9E6 3E 80 -  -   ld a,$80
+  239 D1:A9E8 80 -  -  -   add a,b
+  240 D1:A9E9 77 -  -  -   ld (hl),a
+  241 D1:A9EA -  -  -  -   
+  242 D1:A9EA 23 -  -  -   inc hl 
+  243 D1:A9EB 48 -  -  -   ld c,b ;track b for even odd cmp
+  244 D1:A9EC -  -  -  -   
+  245 D1:A9EC AF -  -  -   xor a
+  246 D1:A9ED B8 -  -  -   cp a,b ;check for zero skip
+  247 D1:A9EE CA 0D AA D1  jp z,oddDigits
+  248 D1:A9F2 -  -  -  -  
+  249 D1:A9F2 -  -  -  -  insertNumberLoop:
+  250 D1:A9F2 5B F1 -  -   pop.lil af
+  251 D1:A9F4 -  -  -  -  ;a << 4
+  252 D1:A9F4 87 -  -  -   add a,a
+  253 D1:A9F5 87 -  -  -   add a,a
+  254 D1:A9F6 87 -  -  -   add a,a
+  255 D1:A9F7 87 -  -  -   add a,a
+  256 D1:A9F8 -  -  -  -  ;
+  257 D1:A9F8 57 -  -  -   ld d,a
+  258 D1:A9F9 5B F1 -  -   pop.lil af
+  259 D1:A9FB 82 -  -  -   add a,d
+  260 D1:A9FC 77 -  -  -   ld (hl),a
+  261 D1:A9FD 23 -  -  -   inc hl
+  262 D1:A9FE -  -  -  -  
+  263 D1:A9FE 05 -  -  -   dec b
+  264 D1:A9FF 3E 01 -  -   ld a,1
+  265 D1:AA01 B8 -  -  -   cp a,b
+  266 D1:AA02 05 -  -  -   dec b
+  267 D1:AA03 DA F2 A9 D1  jp c,insertNumberLoop
+  268 D1:AA07 -  -  -  -  
+  269 D1:AA07 CB 41 -  -   bit 0,c
+  270 D1:AA09 C2 14 AA D1  jp nz,evenDigits
+  271 D1:AA0D -  -  -  -  
+  272 D1:AA0D -  -  -  -  oddDigits:
+  273 D1:AA0D 5B F1 -  -   pop.lil af
+  274 D1:AA0F -  -  -  -  ;a << 4
+  275 D1:AA0F 87 -  -  -   add a,a
+  276 D1:AA10 87 -  -  -   add a,a
+  277 D1:AA11 87 -  -  -   add a,a
+  278 D1:AA12 87 -  -  -   add a,a
+  279 D1:AA13 -  -  -  -  ;
+  280 D1:AA13 77 -  -  -   ld (hl),a
+  281 D1:AA14 -  -  -  -  evenDigits:
+  282 D1:AA14 -  -  -  -   
+  283 D1:AA14 C9 -  -  -   ret
+  284 D1:AA15 -  -  -  -   
+  285 D1:AA15 -  -  -  -  
+  286 D1:AA15 -  -  -  -  .assume ADL=1
+  287 D1:AA15 -  -  -  -  ;ez80 mode
+  288 D1:AA15 -  -  -  -  ;load float into int
+  289 D1:AA15 -  -  -  -  ;a = float
+  290 D1:AA15 -  -  -  -  ;hl = OP(x)
+  291 D1:AA15 -  -  -  -  ;corrupts ...
+  292 D1:AA15 -  -  -  -  FloatToInt:
+  293 D1:AA15 -  -  -  -   
+  294 D1:AA15 -  -  -  -  
+  295 D1:AA15 -  -  -  -  .assume ADL=1
+  296 D1:AA15 -  -  -  -  ;source: https://wikiti.brandonw.net/index.php?title=Z80_Routines:Math:Division
+  297 D1:AA15 -  -  -  -  ;z80 mode
+  298 D1:AA15 -  -  -  -  ;8 bit division
+  299 D1:AA15 -  -  -  -  ;d = divisor
+  300 D1:AA15 -  -  -  -  ;e = dividend
+  301 D1:AA15 -  -  -  -  ;d = quotient
+  302 D1:AA15 -  -  -  -  ;a = remainder
+  303 D1:AA15 -  -  -  -  ;corrupts b
+  304 D1:AA15 -  -  -  -  div_d_e:
+  305 D1:AA15 AF -  -  -     xor	a
+  306 D1:AA16 06 08 -  -     ld	b, 8
+  307 D1:AA18 -  -  -  -  
+  308 D1:AA18 -  -  -  -  _loop:
+  309 D1:AA18 CB 22 -  -     sla	d
+  310 D1:AA1A 17 -  -  -     rla
+  311 D1:AA1B BB -  -  -     cp	e
+  312 D1:AA1C 38 02 -  -     jr	c, $+4
+  313 D1:AA1E 93 -  -  -     sub	e
+  314 D1:AA1F 14 -  -  -     inc	d
+  315 D1:AA20 -  -  -  -     
+  316 D1:AA20 10 F6 -  -     djnz	_loop
+  317 D1:AA22 -  -  -  -     
+  318 D1:AA22 C9 -  -  -     ret

@@ -1,5 +1,5 @@
 .nolist
-#include "../includes/ti84pce.inc"
+#include "/includes/ti84pce.inc"
 .list
  .assume ADL=1
  .org userMem-2
@@ -21,7 +21,6 @@ main:
  ld a,$d1
  ld mb,a
 
- call _RandInit
  call _Random
  ld hl,OP1
  call dispFloat
