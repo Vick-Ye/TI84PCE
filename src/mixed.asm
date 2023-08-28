@@ -48,19 +48,6 @@ float:
 ;b <= a <= c
 ;corrupts ...
 getRandom:
- ;[0,1) * (c-b+1) + b = [b,c]
- ;c => op1
- ;b => op2
- ;op1 -= op2
- ;1 => op2
- ;op1 += op2
- ;ld op2,op1
- ;rand => op1
- ;op1 * op2
- ;b -> op2
- ;op1 += op2
- ;int(op1)
-
  push.lil bc
  ld a,c
  ld hl,OP1
@@ -183,23 +170,19 @@ dispFloatLoop:
  ld hl,dispFloatVar
  call _PutS
 
+ ;reset float var
+ ld hl,dispFloatVar
+ ld (hl),$30
+ ld de,dispFloatVar
+ inc de
+ ld bc,14
+ ldir
+
  ret
 
 dispFloatVar:
  .db $30,$30,$30,$30,$30,$30,$30,$30,$30,$30,$30,$30,$30,$30,$30 ;float digits (one extra for decimal point)
  .db 0
-
-.assume ADL=1
-;ez80 mode
-;ld OP(x), OP(y)
-;de = OP(x)
-;hl = OP(y)
-;corrupts hl,de,bc
-ldFloat:
- ld bc,12
- ldir
-
- ret
 
 .assume ADL=1
 ;ez80 mode
@@ -290,11 +273,17 @@ evenDigits:
 ;hl = OP(x)
 ;corrupts ...
 FloatToInt:
- 
+ inc hl
+ ld b,(hl)
+ inc hl
+ xor a
+floatToIntLoop:
+ ld 
+ mult
 
 .assume ADL=1
 ;source: https://wikiti.brandonw.net/index.php?title=Z80_Routines:Math:Division
-;z80 mode
+;ez80 mode
 ;8 bit division
 ;d = divisor
 ;e = dividend
