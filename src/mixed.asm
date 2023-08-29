@@ -278,12 +278,12 @@ FloatToInt:
  inc hl
  xor a
 floatToIntLoop:
- ld 
+
  mult
 
 .assume ADL=1
 ;source: https://wikiti.brandonw.net/index.php?title=Z80_Routines:Math:Division
-;ez80 mode
+;ez80 or z80 mode
 ;8 bit division
 ;d = divisor
 ;e = dividend
@@ -304,4 +304,26 @@ _loop:
    
    djnz	_loop
    
-   ret
+   ret.l
+
+.assume ADL=1
+;ez80 or z80 mode
+;source: https://wikiti.brandonw.net/index.php?title=Z80_Routines:Math:Multiplication
+;h * e = hl
+;corrupts ...
+mult_h_e
+   ld	d, 0	; Combining the overhead and
+   sla	h	; optimised first iteration
+   sbc	a, a
+   and	e
+   ld	l, a
+   
+   ld	b, 7
+_loop:
+   add	hl, hl          
+   jr	nc, $+3
+   add	hl, de
+   
+   djnz	_loop
+   
+   ret.l

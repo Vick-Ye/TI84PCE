@@ -228,14 +228,6 @@ dequeue:
 
 .assume ADL=1
 ;ez80 mode
-;gets random number
-;b <= a <= c
-;corrupts ...
-getRandom:
- 
-
-.assume ADL=1
-;ez80 mode
 ;sets dir
 ;de = new dir
 ;corrupts a
